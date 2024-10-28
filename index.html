@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>영어-한글 단어장</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 10px;
+        }
+        .card {
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card.flipped .card-inner {
+            transform: rotateX(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 12px;
+        }
+        .card-front {
+            background: white;
+            border: 1px solid #333;
+            transition: border-color 0.3s;
+        }
+        .card:hover .card-front {
+            border-color: #90EE90;
+        }
+        .card-back {
+            background: #40E0D0;
+            color: white;
+            transform: rotateX(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">영어-한글 단어장</h1>
+        <div class="grid" id="cardGrid"></div>
+    </div>
+
+    <script>
+      const DATA = [
+  { english: "procrastinate", korean: "미루다, 지연하다" },
+  { english: "procrastinator", korean: "일을 미루는 사람" },
+  { english: "hit the books", korean: "공부를 시작하다" },
+  { english: "stay up late", korean: "늦게까지 깨어있다" },
+  { english: "pull an all-nighter", korean: "밤을 새우다" },
+  { english: "burn the midnight oil", korean: "밤늦게까지 공부하다" },
+  { english: "burn the candle at both ends", korean: "과도하게 일하다/공부하다" },
+  { english: "catch on", korean: "이해하기 시작하다" },
+  { english: "cram", korean: "벼락치기하다" },
+  { english: "learn by heart", korean: "암기하다" },
+  { english: "get a good mark", korean: "좋은 성적을 받다" },
+  { english: "get a bad mark", korean: "나쁜 성적을 받다" },
+  { english: "kill", korean: "시험을 아주 잘 보다" },
+  { english: "ace", korean: "시험에서 만점을 받다" },
+  { english: "pass with flying colors", korean: "매우 우수한 성적으로 합격하다" },
+  { english: "blow", korean: "시험을 망치다" },
+  { english: "screw up", korean: "실수하다, 망치다" },
+  { english: "pass by the skin of one's teeth", korean: "간신히 통과하다" },
+  { english: "fail", korean: "낙제하다" },
+  { english: "drop", korean: "수업을 취소하다" },
+  { english: "college", korean: "단과대학" },
+  { english: "president", korean: "총장" },
+  { english: "undergraduate", korean: "학부생의" },
+  { english: "graduate", korean: "대학원생의" },
+  { english: "semester", korean: "학기" },
+  { english: "sign up for", korean: "수강신청하다" },
+  { english: "credit hour", korean: "학점" },
+  { english: "double major", korean: "복수전공하다" },
+  { english: "degree", korean: "학위" },
+  { english: "scholarship", korean: "장학금" },
+  { english: "grade point average", korean: "평균평점" },
+  { english: "take a leave of absence", korean: "휴학하다" },
+  { english: "drop out", korean: "자퇴하다" },
+  { english: "audit", korean: "청강하다" },
+  { english: "build up qualification", korean: "스펙을 쌓다" },
+  { english: "seek", korean: "찾다, 구하다" },
+  { english: "contract", korean: "병에 걸리다" },
+  { english: "contagious", korean: "전염성의" },
+  { english: "isolate", korean: "격리하다" },
+  { english: "halt", korean: "중단하다" },
+  { english: "pathogen", korean: "병원체" },
+  { english: "carrier", korean: "보균자" },
+  { english: "diagnostic", korean: "진단의" },
+  { english: "symptom", korean: "증상" },
+  { english: "incubation period", korean: "잠복기" },
+  { english: "ultimate", korean: "최종적인" },
+  { english: "deadly", korean: "치명적인" },
+  { english: "epidemic", korean: "유행병" },
+  { english: "immunity", korean: "면역력" },
+  { english: "deliberately", korean: "고의로" }, { english: "procrastinate", korean: "미루다, 지연하다" },
+  { english: "procrastinator", korean: "일을 미루는 사람" },
+  { english: "hit the books", korean: "공부를 시작하다" },
+  { english: "stay up late", korean: "늦게까지 깨어있다" },
+  { english: "pull an all-nighter", korean: "밤을 새우다" },
+  { english: "burn the midnight oil", korean: "밤늦게까지 공부하다" },
+  { english: "burn the candle at both ends", korean: "과도하게 일하다/공부하다" },
+  { english: "catch on", korean: "이해하기 시작하다" },
+  { english: "cram", korean: "벼락치기하다" },
+  { english: "learn by heart", korean: "암기하다" },
+
+  // 시험 성적
+  { english: "get a good/high mark", korean: "좋은 성적을 받다" },
+  { english: "get a bad/low mark", korean: "나쁜 성적을 받다" },
+  { english: "kill", korean: "시험을 아주 잘 보다" },
+  { english: "ace", korean: "시험에서 만점을 받다" },
+  { english: "pass with flying colors", korean: "매우 우수한 성적으로 합격하다" },
+  { english: "blow", korean: "시험을 망치다" },
+  { english: "screw up", korean: "실수하다, 망치다" },
+  { english: "pass by the skin of one's teeth", korean: "간신히 통과하다" },
+  { english: "fail/flunk", korean: "낙제하다" },
+  { english: "drop", korean: "수업을 취소하다" },
+
+  // 대학 관련 용어
+  { english: "college", korean: "단과대학" },
+  { english: "president", korean: "총장" },
+  { english: "undergraduate", korean: "학부생의" },
+  { english: "graduate", korean: "대학원생의" },
+  { english: "semester", korean: "학기" },
+  { english: "sign up for", korean: "수강신청하다" },
+  { english: "enroll in", korean: "수강신청하다" },
+  { english: "register for", korean: "수강신청하다" },
+  { english: "take", korean: "수업을 듣다" },
+  { english: "credit hour", korean: "학점" },
+  { english: "double major", korean: "복수전공하다" },
+  { english: "degree", korean: "학위" },
+  { english: "scholarship", korean: "장학금" },
+  { english: "grade point average", korean: "평균평점" },
+  { english: "take a leave of absence", korean: "휴학하다" },
+  { english: "drop out", korean: "자퇴하다" },
+  { english: "audit", korean: "청강하다" },
+  { english: "build up qualification", korean: "스펙을 쌓다" },
+  { english: "enhance resume", korean: "스펙을 쌓다" },
+
+  // 질병/의학 관련 용어
+  { english: "seek", korean: "찾다, 구하다" },
+  { english: "contract", korean: "병에 걸리다" },
+  { english: "contagious", korean: "전염성의" },
+  { english: "isolate", korean: "격리하다" },
+  { english: "halt", korean: "중단하다" },
+  { english: "pathogen", korean: "병원체" },
+  { english: "carrier", korean: "보균자" },
+  { english: "diagnostic", korean: "진단의" },
+  { english: "symptom", korean: "증상" },
+  { english: "incubation period", korean: "잠복기" },
+  { english: "ultimate", korean: "최종적인" },
+  { english: "deadly", korean: "치명적인" },
+  { english: "epidemic", korean: "유행병" },
+  { english: "decimate", korean: "대량 파괴하다" },
+  { english: "immunity", korean: "면역력" },
+  { english: "deliberately", korean: "고의로" },
+  { english: "infect", korean: "감염시키다" },
+  { english: "claim", korean: "생명을 앗아가다" },
+  { english: "ravage", korean: "황폐화하다" },
+  { english: "virulent", korean: "극도로 유해한" },
+  { english: "inoculate", korean: "예방접종하다" },
+  { english: "eradicate", korean: "근절하다" },
+  { english: "microbe", korean: "미생물" },
+  { english: "plague", korean: "괴롭히다" },
+  { english: "fatality rate", korean: "치사율" },
+  { english: "outbreak", korean: "발병" },
+  { english: "antibiotic", korean: "항생제" },
+  { english: "hygiene", korean: "위생" },
+  { english: "transmit", korean: "전염시키다" },
+  { english: "antigen", korean: "항원" },
+  { english: "antibody", korean: "항체" },
+  { english: "host", korean: "숙주" },
+  { english: "mutation", korean: "돌연변이" },
+  { english: "quarantine", korean: "격리(하다)" },
+  { english: "diagnosis", korean: "진단" },
+  { english: "immune", korean: "면역의" },
+  { english: "dose", korean: "투약량" },
+  { english: "infrastructure", korean: "기반시설" },
+  { english: "personnel", korean: "인력, 직원" },
+  { english: "deployment", korean: "배치, 전개" }
+];
+
+        const flipped = new Array(DATA.length).fill(false);
+        const cardGrid = document.getElementById('cardGrid');
+
+        function createCard(word, index) {
+            const cardContainer = document.createElement('div');
+            cardContainer.className = 'card';
+            
+            const cardInner = document.createElement('div');
+            cardInner.className = 'card-inner';
+            
+            const frontFace = document.createElement('div');
+            frontFace.className = 'card-face card-front';
+            frontFace.textContent = word.english;
+            
+            const backFace = document.createElement('div');
+            backFace.className = 'card-face card-back';
+            backFace.textContent = word.korean;
+            
+            cardInner.appendChild(frontFace);
+            cardInner.appendChild(backFace);
+            cardContainer.appendChild(cardInner);
+            
+            cardContainer.addEventListener('click', () => {
+                flipped[index] = !flipped[index];
+                cardContainer.classList.toggle('flipped');
+            });
+            
+            return cardContainer;
+        }
+
+        DATA.forEach((word, index) => {
+            cardGrid.appendChild(createCard(word, index));
+        });
+    </script>
+</body>
+</html>
